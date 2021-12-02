@@ -1,0 +1,11 @@
+H:\desktop\Odoo Receipt Print\ORP\bin\Debug\ORP.exe.config
+H:\desktop\Odoo Receipt Print\ORP\bin\Debug\ORP.exe
+H:\desktop\Odoo Receipt Print\ORP\bin\Debug\ORP.pdb
+H:\desktop\Odoo Receipt Print\ORP\bin\Debug\ORP.xml
+H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.vbprojResolveAssemblyReference.cache
+H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.Form1.resources
+H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.Resources.resources
+H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.vbproj.GenerateResource.Cache
+H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.exe
+H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.xml
+H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.pdb
