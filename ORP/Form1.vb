@@ -12,4 +12,12 @@
     Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
         closingForm()
     End Sub
+
+    Private Sub btnSetting_Click(sender As Object, e As EventArgs) Handles btnSetting.Click
+        'Open Form setting
+        Dim fsetting As New FormSetting
+        fsetting.ShowDialog()
+
+    End Sub
 End Class
+

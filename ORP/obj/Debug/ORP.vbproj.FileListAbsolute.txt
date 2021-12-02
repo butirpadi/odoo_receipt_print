@@ -9,3 +9,25 @@ H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.vbproj.GenerateResource.Cache
 H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.exe
 H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.xml
 H:\desktop\Odoo Receipt Print\ORP\obj\Debug\ORP.pdb
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\ORP.exe.config
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.exe
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.xml
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.pdb
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\ORP.exe
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\ORP.pdb
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\ORP.xml
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.vbprojResolveAssemblyReference.cache
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.Form1.resources
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.Resources.resources
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.vbproj.GenerateResource.Cache
+D:\WindowsDev\odoo_receipt_print\ORP\obj\Debug\ORP.FormSetting.resources
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\EntityFramework.dll
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\EntityFramework.SqlServer.dll
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\System.Data.SQLite.dll
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\System.Data.SQLite.EF6.dll
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\System.Data.SQLite.Linq.dll
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\EntityFramework.xml
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\EntityFramework.SqlServer.xml
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\System.Data.SQLite.xml
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\Newtonsoft.Json.dll
+D:\WindowsDev\odoo_receipt_print\ORP\bin\Debug\Newtonsoft.Json.xml
