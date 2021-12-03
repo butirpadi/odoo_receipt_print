@@ -114,7 +114,7 @@ Partial Class FormSetting
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 10
-        Me.btnCancel.Text = "Cancel"
+        Me.btnCancel.Text = "Close"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
         'btnSave
@@ -132,9 +132,9 @@ Partial Class FormSetting
         Me.btnConnect.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnConnect.Location = New System.Drawing.Point(12, 137)
         Me.btnConnect.Name = "btnConnect"
-        Me.btnConnect.Size = New System.Drawing.Size(75, 23)
+        Me.btnConnect.Size = New System.Drawing.Size(104, 23)
         Me.btnConnect.TabIndex = 12
-        Me.btnConnect.Text = "Connect"
+        Me.btnConnect.Text = "Test Connection"
         Me.btnConnect.UseVisualStyleBackColor = True
         '
         'FormSetting

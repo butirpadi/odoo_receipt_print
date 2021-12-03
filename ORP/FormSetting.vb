@@ -6,6 +6,9 @@ Imports System.Text
 Imports Newtonsoft.Json
 
 
+
+
+
 Public Class FormSetting
 
     Dim mydata As DataTable
@@ -19,6 +22,7 @@ Public Class FormSetting
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         ' SAVE SETTING TO SQLITE DATABASE
         Dim query As String = "UPDATE orp_setting SET server_location = @server, db_name = @dbname, username = @username, password = @password WHERE id = 1;"
+        myconn = New SQLiteConnection("Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.db" + "; Integrated Security=true")
         Try
             Using myconn
                 myconn.Open()
@@ -35,13 +39,13 @@ Public Class FormSetting
                     'dr = cmd.ExecuteReader()
                     cmd.ExecuteNonQuery()
                 End Using
-                myconn.Close()
+                'myconn.Close()
             End Using
         Catch ex As Exception
             MessageBox.Show(ex.ToString, "Error")
         End Try
 
-        Me.Close()
+        'Me.Close()
     End Sub
 
     Private Sub FormSetting_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -64,66 +68,55 @@ Public Class FormSetting
         myconn.Close()
     End Sub
 
+
+
     Private Sub btnConnect_Click(sender As Object, e As EventArgs) Handles btnConnect.Click
-        Console.WriteLine("Testing connection .........")
         ' test connectino and get session
+        'Dim jsonData = "{
+        '      ""jsonrpc"":     ""2.0"",
+        '      ""method"": ""call"",
+        '      ""id"": 1,
+        '      ""params"": {
+        '        ""login"": """ & tbUsername.Text & """,
+        '        ""password"": """ & tbPassword.Text & """,
+        '        ""db"": """ & tbDatabase.Text & """,
+        '        ""context"": {}
+        '      }
+        '    }"
 
+        'Dim postData = Encoding.ASCII.GetBytes(jsonData)
 
-        'Dim NewData As New JSON_Post
-        'NewData.username = "Service_Provider_Username"
-        'NewData.password = "Service_Provider_Password"
-        'NewData.client_id = "client_id"
-        'NewData.client_secret = "client_secret"
-        'NewData.grant_type = "password"
+        'Dim myReq As HttpWebRequest = HttpWebRequest.Create(tbServer.Text & "/web/session/authenticate")
+        'myReq.Method = "POST"
+        'myReq.ContentType = "application/json"
+        'myReq.ContentLength = postData.Length
+        'myReq.UserAgent = "Microsoft VB.Net"
+        'myReq.Timeout = 30000
 
-        'Dim PostString As String = JsonConvert.SerializeObject(NewData)
-        'Dim byteArray As Byte() = Encoding.UTF8.GetBytes(PostString)
-        'myReq.ContentLength = byteArray.Length
+        'Try
+        '    Using stream = myReq.GetRequestStream()
+        '        stream.Write(postData, 0, postData.Length)
+        '    End Using
 
-        Dim jsonData = "{
-              ""jsonrpc"":     ""2.0"",
-              ""method"": ""call"",
-              ""id"": 1,
-              ""params"": {
-                ""login"": """ & tbUsername.Text & """,
-                ""password"": """ & tbPassword.Text & """,
-                ""db"": """ & tbDatabase.Text & """,
-                ""context"": {}
-              }
-            }"
+        '    Dim response As HttpWebResponse = myReq.GetResponse()
+        '    Dim dataStream As Stream = response.GetResponseStream()
+        '    Dim reader As StreamReader = New StreamReader(dataStream)
+        '    Dim responseString = reader.ReadToEnd()
+        '    Dim odooResp As OdooResponse = JsonConvert.DeserializeObject(Of OdooResponse)(responseString)
 
-        Console.WriteLine("JSON Data")
-        Console.WriteLine(jsonData)
-
-        Dim postData = Encoding.ASCII.GetBytes(jsonData)
-
-        Dim myReq As HttpWebRequest = HttpWebRequest.Create(tbServer.Text & "/web/session/authenticate")
-        myReq.Method = "POST"
-        myReq.ContentType = "application/json"
-        myReq.ContentLength = postData.Length
-        myReq.UserAgent = "Microsoft VB.Net"
-        myReq.Timeout = 30000
+        '    MessageBox.Show(responseString, "Connection Success")
+        'Catch ex As WebException
+        '    Console.WriteLine(ex.ToString)
+        'End Try
 
         Try
-            Using stream = myReq.GetRequestStream()
-                stream.Write(postData, 0, postData.Length)
-            End Using
-
-            Dim response As HttpWebResponse = myReq.GetResponse()
-            Dim dataStream As Stream = response.GetResponseStream()
-            Dim reader As StreamReader = New StreamReader(dataStream)
-            Dim responseString = reader.ReadToEnd()
-
-            'Dim ThisData As JObject = JsonConvert.DeserializeObject(Of JObject)(responseString)
-
-
-            Console.WriteLine(responseString)
-        Catch ex As WebException
-            Console.WriteLine(ex.ToString)
+            MessageBox.Show(OdooConnection.GetSessionId(tbServer.Text, tbDatabase.Text, tbUsername.Text, tbPassword.Text), "Connection Success")
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString, "Error Connection")
         End Try
-
-
-
 
     End Sub
 End Class
+
+
+
