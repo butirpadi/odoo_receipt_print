@@ -3,8 +3,23 @@ Imports System.IO
 Imports System.Net
 Imports System.Text
 Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class Form1
+
+    Dim WithEvents fsetting As New FormSetting
+
+    Private Sub fsetting_on_datasaved(sender As Object, e As EventArgs) Handles fsetting.DataSaved
+        Console.WriteLine("Data Setting Saved -----------------------------")
+        Me.doc_type_idx = fsetting.DocumentTypeIndex
+        Me.cbDocType.SelectedIndex = fsetting.DocumentTypeIndex
+        Me.server_location = fsetting.ServerLocation
+        Me.username = fsetting.Username
+        Me.password = fsetting.Password
+        Me.dbname = fsetting.Database
+    End Sub
+
+
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         closingForm()
     End Sub
@@ -21,7 +36,7 @@ Public Class Form1
 
     Private Sub btnSetting_Click(sender As Object, e As EventArgs) Handles btnSetting.Click
         'Open Form setting
-        Dim fsetting As New FormSetting
+
         fsetting.ShowDialog()
 
     End Sub
@@ -32,15 +47,23 @@ Public Class Form1
             Dim session_id As String = OdooConnection.GetSessionId(Me.server_location, Me.dbname, Me.username, Me.password)
             Dim jsonData = OdooConnection.GetConnectionString(Me.dbname, Me.username, Me.password)
 
+            'Dim postDataAccountInvoice = "{
+            '                  ""jsonrpc"":  ""2.0"",
+            '                  ""method"": ""call"",
+            '                  ""id"": 1,
+            '                  ""params"": {
+            '                    ""model"": ""account.invoice"",
+            '                    ""domain"": [[""number"", ""="", """ & tbDocNumber.Text & """]]
+            '                  }
+            '                }"
             Dim postDataAccountInvoice = "{
-                              ""jsonrpc"":  ""2.0"",
-                              ""method"": ""call"",
-                              ""id"": 1,
-                              ""params"": {
-                                ""model"": ""account.invoice"",
-                                ""domain"": [[""number"", ""="", """ & tbDocNumber.Text & """]]
-                              }
-                            }"
+                  ""jsonrpc"":   ""2.0"",
+                  ""method"": ""call"",
+                  ""id"": 1,
+                  ""params"": {
+                    ""number"": """ & tbDocNumber.Text & """
+                  }
+                }"
 
             Console.WriteLine("Session ID : " & session_id)
             If session_id <> "" Then
@@ -48,8 +71,9 @@ Public Class Form1
                 ' search document 
                 Dim postData = Encoding.ASCII.GetBytes(postDataAccountInvoice)
 
-                'Dim myReq As HttpWebRequest = HttpWebRequest.Create(Me.server_location & "/get/customer/invoice")
-                Dim myReq As HttpWebRequest = HttpWebRequest.Create(Me.server_location & "/web/dataset/search_read")
+                Dim myReq As HttpWebRequest = HttpWebRequest.Create(Me.server_location & "/get/customer/invoice")
+                'Dim myReq As HttpWebRequest = HttpWebRequest.Create(Me.server_location & "/web/dataset/search_read")
+
                 myReq.Method = "POST"
                 myReq.ContentType = "application/json"
                 myReq.ContentLength = postData.Length
@@ -66,7 +90,22 @@ Public Class Form1
                     Dim dataStream As Stream = response.GetResponseStream()
                     Dim reader As StreamReader = New StreamReader(dataStream)
                     Dim responseString = reader.ReadToEnd()
-                    Console.WriteLine(responseString)
+
+                    Dim invoiceJobj As JObject = JObject.Parse(responseString)
+                    Dim resultsObj As JObject = invoiceJobj("result")
+                    Dim invoiceLines As JArray = resultsObj("invoice_lines")
+
+                    For Each line As JObject In invoiceLines
+                        Console.WriteLine(line("no"))
+                        Console.WriteLine(line("code"))
+                        Console.WriteLine(line("name"))
+                        Console.WriteLine(line("qty"))
+                        Console.WriteLine(line("uom"))
+                        Console.WriteLine(line("price_unit"))
+                        Console.WriteLine(line("disc"))
+                        Console.WriteLine(line("subtotal"))
+                        Console.WriteLine("---------------------------------------------")
+                    Next
 
                 Catch ex As WebException
                     Console.WriteLine(ex.ToString)
@@ -103,6 +142,7 @@ Public Class Form1
     Private dbname As String
     Private username As String
     Private password As String
+    Private doc_type_idx As Integer = -1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' load credential from sqlite 
@@ -118,11 +158,26 @@ Public Class Form1
             Me.username = reader("username").ToString
             Me.password = reader("password").ToString
             Me.dbname = reader("db_name").ToString
+
+            Dim index As Integer = reader.GetOrdinal("doc_type_idx")
+            If Not reader.IsDBNull(index) Then
+                Me.doc_type_idx = CInt(reader("doc_type_idx"))
+            Else
+                Me.doc_type_idx = -1
+            End If
+            Me.cbDocType.SelectedIndex = Me.doc_type_idx
         End While
 
         reader.Close()
         myconn.Close()
         ' ---------------------------------------------------------------
+    End Sub
+
+    Private Sub tbDocNumber_KeyPress(sender As Object, e As KeyPressEventArgs) Handles tbDocNumber.KeyPress
+        If e.KeyChar = Chr(Keys.Enter) Then
+            btnSearch.PerformClick()
+
+        End If
     End Sub
 End Class
 

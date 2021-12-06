@@ -11,8 +11,56 @@ Imports Newtonsoft.Json
 
 Public Class FormSetting
 
-    Dim mydata As DataTable
     Dim myconn As SQLiteConnection
+    Public Event DataSaved As EventHandler
+
+    Property ServerLocation() As String
+        Get
+            Return Me.tbServer.Text
+        End Get
+        Set(ByVal Value As String)
+            Me.tbServer.Text = Value
+        End Set
+    End Property
+
+    Property Username() As String
+        Get
+            Return Me.tbUsername.Text
+        End Get
+        Set(ByVal Value As String)
+            Me.tbUsername.Text = Value
+        End Set
+    End Property
+
+    Property Password() As String
+        Get
+            Return Me.tbPassword.Text
+        End Get
+        Set(ByVal Value As String)
+            Me.tbPassword.Text = Value
+        End Set
+    End Property
+
+    Property Database() As String
+        Get
+            Return Me.tbDatabase.Text
+        End Get
+        Set(ByVal Value As String)
+            Me.tbDatabase.Text = Value
+        End Set
+    End Property
+
+    Property DocumentTypeIndex() As Integer
+        Get
+            Return Me.cbDocType.SelectedIndex
+        End Get
+        Set(ByVal Value As Integer)
+            Me.cbDocType.SelectedIndex = Value
+        End Set
+    End Property
+
+
+
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
         Me.Close()
@@ -21,7 +69,7 @@ Public Class FormSetting
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         ' SAVE SETTING TO SQLITE DATABASE
-        Dim query As String = "UPDATE orp_setting SET server_location = @server, db_name = @dbname, username = @username, password = @password WHERE id = 1;"
+        Dim query As String = "UPDATE orp_setting SET server_location = @server, db_name = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx WHERE id = 1;"
         myconn = New SQLiteConnection("Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.db" + "; Integrated Security=true")
         Try
             Using myconn
@@ -34,6 +82,7 @@ Public Class FormSetting
                         .Add(New SQLiteParameter("@dbname", tbDatabase.Text))
                         .Add(New SQLiteParameter("@username", tbUsername.Text))
                         .Add(New SQLiteParameter("@password", tbPassword.Text))
+                        .Add(New SQLiteParameter("@doc_type_idx", cbDocType.SelectedIndex))
                     End With
                     'Dim dr As SQLiteDataReader
                     'dr = cmd.ExecuteReader()
@@ -41,6 +90,8 @@ Public Class FormSetting
                 End Using
                 'myconn.Close()
             End Using
+
+            RaiseEvent DataSaved(Me, e)
         Catch ex As Exception
             MessageBox.Show(ex.ToString, "Error")
         End Try
@@ -62,6 +113,12 @@ Public Class FormSetting
             tbUsername.Text = reader("username").ToString
             tbPassword.Text = reader("password").ToString
             tbDatabase.Text = reader("db_name").ToString
+
+            Dim index As Integer = reader.GetOrdinal("doc_type_idx")
+
+            If Not reader.IsDBNull(index) Then
+                cbDocType.SelectedIndex = CInt(reader("doc_type_idx"))
+            End If
         End While
 
         reader.Close()
