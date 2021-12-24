@@ -252,3 +252,4 @@ ModelManifest.xml
 /bin/Debug/x64/*
 /bin/Debug/*
 /obj/Debug/*
+/obj/Debug/*.txt

@@ -250,4 +250,5 @@ ModelManifest.xml
 # debug
 /bin/Debug/x86/*
 /bin/Debug/x64/*
+/bin/Debug/*
 /obj/Debug/*
