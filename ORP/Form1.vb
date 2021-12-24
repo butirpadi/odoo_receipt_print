@@ -120,14 +120,14 @@ Public Class Form1
             '5. Vendor Bill
 
             ' default document type is sales order
-            Dim request_url = Me.server_location & "/get/sales/order"
+            Dim request_url = Me.server_location & "/get/sales/order" 'OK
 
             If Me.cbDocType.SelectedItem = "Customer Invoice" Then 'OK
                 request_url = Me.server_location & "/get/customer/invoice"
-            ElseIf Me.cbDocType.SelectedItem = "Purchase Order" Then
+            ElseIf Me.cbDocType.SelectedItem = "Purchase Order" Then 'OK
                 request_url = Me.server_location & "/get/purchase/order"
             ElseIf Me.cbDocType.SelectedItem = "Delivery Order" Then
-                request_url = Me.server_location & "/get/delivery/order"
+                request_url = Me.server_location & "/get/delivery/order" ' OK
             ElseIf Me.cbDocType.SelectedItem = "Vendor Bill" Then 'OK
                 request_url = Me.server_location & "/get/vendor/bill"
             End If
@@ -162,12 +162,12 @@ Public Class Form1
                     ' Show data to input
                     Me.tbPreviewNumber.Text = resultsObj("number")
                     Me.tbPreviewPartner.Text = resultsObj("partner")
-                    Me.tbPreviewDate.Text = resultsObj("invoice_date")
-                    If resultsObj("partner") <> "" Then
+                    Me.tbPreviewDate.Text = resultsObj("date")
+                    If resultsObj("printer_data") <> "" Then
                         Me.cbPreviewAvailable.Checked = True
                         Me.btnGeneratePrinterData.Visible = False
                         Me.btnPrint.Enabled = True
-                        Me.printer_data = resultsObj("printer_data")
+                        Me.printer_data = resultsObj("printer_data").ToString.Replace("<p>", "").Replace("</p>", "").Replace("< / p >", "").Replace("< p >", "").Replace("&amp;", "&")
                     Else
                         Me.cbPreviewAvailable.Checked = False
                         Me.btnGeneratePrinterData.Visible = True
@@ -304,12 +304,12 @@ Public Class Form1
     Private Sub btnPrint_Click(sender As Object, e As EventArgs) Handles btnPrint.Click
         Try
             Dim printer As New ESC_POS_USB_NET.Printer.Printer(Me.printerName)
-            printer.Append(Me.printer_data.Replace("<p>", "").Replace("</p>", ""))
+            printer.Append(Me.printer_data)
             printer.PrintDocument()
 
             ' delaying on printing and progressbar
             Me.btnPrint.Enabled = False
-            For i As Integer = 10 To 100
+            For i As Integer = 10 To Me.ProgressBar1.Maximum
                 Me.ProgressBar1.Value = i
                 Threading.Thread.Sleep(100)
             Next
@@ -335,6 +335,17 @@ Public Class Form1
         Else
             MessageBox.Show("Password is not valid.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
+    End Sub
+
+    Private Sub btnTesting_Click(sender As Object, e As EventArgs) Handles btnTesting.Click
+        MsgBox(Me.printer_data)
+        'Try
+        '    Dim printer As New ESC_POS_USB_NET.Printer.Printer(Me.printerName)
+        '    printer.Append("&")
+        '    printer.PrintDocument()
+        'Catch ex As Exception
+        '    MsgBox(ex.Message)
+        'End Try
     End Sub
 End Class
 

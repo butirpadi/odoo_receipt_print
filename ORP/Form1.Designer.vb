@@ -39,14 +39,15 @@ Partial Class Form1
         Me.Label4 = New System.Windows.Forms.Label()
         Me.tbPreviewNumber = New System.Windows.Forms.TextBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.tbPreviewDate = New System.Windows.Forms.TextBox()
         Me.btnGeneratePrinterData = New System.Windows.Forms.Button()
         Me.cbPreviewAvailable = New System.Windows.Forms.CheckBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.tbPreviewPartner = New System.Windows.Forms.TextBox()
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.tbPreviewDate = New System.Windows.Forms.TextBox()
+        Me.btnTesting = New System.Windows.Forms.Button()
         Me.contextMenuTray.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
@@ -188,6 +189,7 @@ Partial Class Form1
         '
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.btnTesting)
         Me.GroupBox1.Controls.Add(Me.Label6)
         Me.GroupBox1.Controls.Add(Me.tbPreviewDate)
         Me.GroupBox1.Controls.Add(Me.btnGeneratePrinterData)
@@ -203,6 +205,26 @@ Partial Class Form1
         Me.GroupBox1.TabIndex = 13
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Data Preview"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(21, 52)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(30, 13)
+        Me.Label6.TabIndex = 18
+        Me.Label6.Text = "Date"
+        '
+        'tbPreviewDate
+        '
+        Me.tbPreviewDate.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.tbPreviewDate.BackColor = System.Drawing.Color.White
+        Me.tbPreviewDate.Enabled = False
+        Me.tbPreviewDate.Location = New System.Drawing.Point(133, 49)
+        Me.tbPreviewDate.Name = "tbPreviewDate"
+        Me.tbPreviewDate.Size = New System.Drawing.Size(244, 20)
+        Me.tbPreviewDate.TabIndex = 19
         '
         'btnGeneratePrinterData
         '
@@ -261,29 +283,23 @@ Partial Class Form1
         Me.ProgressBar1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ProgressBar1.Location = New System.Drawing.Point(12, 339)
+        Me.ProgressBar1.Maximum = 250
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(395, 10)
         Me.ProgressBar1.TabIndex = 14
         '
-        'Label6
+        'btnTesting
         '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(21, 52)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(30, 13)
-        Me.Label6.TabIndex = 18
-        Me.Label6.Text = "Date"
-        '
-        'tbPreviewDate
-        '
-        Me.tbPreviewDate.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbPreviewDate.BackColor = System.Drawing.Color.White
-        Me.tbPreviewDate.Enabled = False
-        Me.tbPreviewDate.Location = New System.Drawing.Point(133, 49)
-        Me.tbPreviewDate.Name = "tbPreviewDate"
-        Me.tbPreviewDate.Size = New System.Drawing.Size(244, 20)
-        Me.tbPreviewDate.TabIndex = 19
+        Me.btnTesting.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnTesting.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.btnTesting.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnTesting.Location = New System.Drawing.Point(311, 147)
+        Me.btnTesting.Name = "btnTesting"
+        Me.btnTesting.Size = New System.Drawing.Size(75, 30)
+        Me.btnTesting.TabIndex = 20
+        Me.btnTesting.Text = "-- TEST --"
+        Me.btnTesting.UseVisualStyleBackColor = False
+        Me.btnTesting.Visible = False
         '
         'Form1
         '
@@ -338,4 +354,5 @@ Partial Class Form1
     Friend WithEvents ProgressBar1 As ProgressBar
     Friend WithEvents Label6 As Label
     Friend WithEvents tbPreviewDate As TextBox
+    Friend WithEvents btnTesting As Button
 End Class

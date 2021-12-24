@@ -200,10 +200,4 @@
         AAfgAAAH4AAAB+AAAAfgAAAH4AAAB+AAAAc=
 </value>
   </data>
-  <metadata name="BackgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>279, 17</value>
-  </metadata>
-  <metadata name="BackgroundWorker2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>442, 17</value>
-  </metadata>
 </root>
