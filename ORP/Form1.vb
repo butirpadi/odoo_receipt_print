@@ -4,10 +4,14 @@ Imports System.Net
 Imports System.Text
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
+Imports ESC_POS_USB_NET
+
 
 Public Class Form1
 
     Dim WithEvents fsetting As New FormSetting
+
+    Public Shared DBConnectionString As String = "Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.sqlite" + "; Integrated Security=true"
 
     Private Sub fsetting_on_datasaved(sender As Object, e As EventArgs) Handles fsetting.DataSaved
         Console.WriteLine("Data Setting Saved -----------------------------")
@@ -144,12 +148,55 @@ Public Class Form1
     Private password As String
     Private doc_type_idx As Integer = -1
 
+    Private Sub initDb(conn As SQLiteConnection)
+        conn.Open()
+        Dim createCmd As SQLiteCommand = conn.CreateCommand()
+        Using createCmd
+            With createCmd
+                .CommandText = "CREATE TABLE IF NOT EXISTS orp_setting (id INTEGER NOT NULL, server_location TEXT, username TEXT, password TEXT, database TEXT, printer_name TEXT, doc_type_idx INTEGER,PRIMARY KEY(id AUTOINCREMENT) )"
+                .ExecuteNonQuery()
+            End With
+        End Using
+
+        Dim selectCmd As SQLiteCommand = conn.CreateCommand()
+        Dim reader As SQLiteDataReader
+        With selectCmd
+            .CommandText = "select * from orp_setting"
+            reader = .ExecuteReader()
+            Using reader
+                If Not reader.HasRows Then
+                    Dim insertCmd As SQLiteCommand = conn.CreateCommand()
+                    With insertCmd
+                        .CommandText = "INSERT INTO orp_setting (server_location,username,password,database,printer_name) values (@server,@username,@password,@database,@printer_name)"
+                        With .Parameters
+                            .Add(New SQLiteParameter("@server", "dummy"))
+                            .Add(New SQLiteParameter("@username", "dummy"))
+                            .Add(New SQLiteParameter("@password", "dummy"))
+                            .Add(New SQLiteParameter("@database", "dummy"))
+                            .Add(New SQLiteParameter("@printer_name", "dummy"))
+                        End With
+                        .ExecuteNonQuery()
+                    End With
+                End If
+
+                reader.Close()
+            End Using
+        End With
+
+
+
+        conn.Close()
+    End Sub
+
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' load credential from sqlite 
-        Dim myconn As New SQLiteConnection("Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.db" + "; Integrated Security=true")
+        Dim myconn As New SQLiteConnection(Form1.DBConnectionString)
+
+        initDb(myconn)
+
         myconn.Open()
         Dim selectCmd As New SQLiteCommand(myconn)
-        selectCmd.CommandText = "select * from orp_setting where id = 1"
+        selectCmd.CommandText = "select * from orp_setting limit 1"
         Dim reader = selectCmd.ExecuteReader()
 
         ' show data to text box
@@ -157,7 +204,7 @@ Public Class Form1
             Me.server_location = reader("server_location").ToString
             Me.username = reader("username").ToString
             Me.password = reader("password").ToString
-            Me.dbname = reader("db_name").ToString
+            Me.dbname = reader("database").ToString
 
             Dim index As Integer = reader.GetOrdinal("doc_type_idx")
             If Not reader.IsDBNull(index) Then
@@ -178,6 +225,13 @@ Public Class Form1
             btnSearch.PerformClick()
 
         End If
+    End Sub
+
+    Private Sub btnPrint_Click(sender As Object, e As EventArgs) Handles btnPrint.Click
+        Dim printer As New Printer.Printer("EPSON LX-300+II ESC/P")
+        printer.Append("Testing Printer")
+        printer.PrintDocument()
+
     End Sub
 End Class
 

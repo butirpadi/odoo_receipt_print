@@ -59,6 +59,15 @@ Public Class FormSetting
         End Set
     End Property
 
+    Property PrinterName As String
+        Get
+            Return Me.tbPrinter.Text
+        End Get
+        Set(value As String)
+            Me.tbPrinter.Text = value
+        End Set
+    End Property
+
 
 
 
@@ -69,8 +78,8 @@ Public Class FormSetting
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         ' SAVE SETTING TO SQLITE DATABASE
-        Dim query As String = "UPDATE orp_setting SET server_location = @server, db_name = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx WHERE id = 1;"
-        myconn = New SQLiteConnection("Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.db" + "; Integrated Security=true")
+        Dim query As String = "UPDATE orp_setting SET server_location = @server, database = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx, printer_name = @printer_name "
+        myconn = New SQLiteConnection(Form1.DBConnectionString)
         Try
             Using myconn
                 myconn.Open()
@@ -83,6 +92,7 @@ Public Class FormSetting
                         .Add(New SQLiteParameter("@username", tbUsername.Text))
                         .Add(New SQLiteParameter("@password", tbPassword.Text))
                         .Add(New SQLiteParameter("@doc_type_idx", cbDocType.SelectedIndex))
+                        .Add(New SQLiteParameter("@printer_name", tbPrinter.Text))
                     End With
                     'Dim dr As SQLiteDataReader
                     'dr = cmd.ExecuteReader()
@@ -101,7 +111,7 @@ Public Class FormSetting
 
     Private Sub FormSetting_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' OPEN SETTING FROM DATABASE
-        myconn = New SQLiteConnection("Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.db" + "; Integrated Security=true")
+        myconn = New SQLiteConnection(Form1.DBConnectionString)
         myconn.Open()
         Dim selectCmd As New SQLiteCommand(myconn)
         selectCmd.CommandText = "select * from orp_setting where id = 1"
@@ -112,7 +122,8 @@ Public Class FormSetting
             tbServer.Text = reader("server_location").ToString
             tbUsername.Text = reader("username").ToString
             tbPassword.Text = reader("password").ToString
-            tbDatabase.Text = reader("db_name").ToString
+            tbDatabase.Text = reader("database").ToString
+            tbPrinter.Text = reader("printer_name").ToString
 
             Dim index As Integer = reader.GetOrdinal("doc_type_idx")
 
@@ -172,6 +183,17 @@ Public Class FormSetting
             MessageBox.Show(ex.ToString, "Error Connection")
         End Try
 
+    End Sub
+
+    Private Sub btnTestPrint_Click(sender As Object, e As EventArgs) Handles btnTestPrint.Click
+        ' Testing printer 
+        Try
+            Dim aPrinter As New ESC_POS_USB_NET.Printer.Printer(Me.tbPrinter.Text)
+            aPrinter.TestPrinter()
+            aPrinter.PrintDocument()
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
     End Sub
 End Class
 

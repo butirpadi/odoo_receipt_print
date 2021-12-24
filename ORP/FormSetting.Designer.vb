@@ -37,6 +37,9 @@ Partial Class FormSetting
         Me.cbDocType = New System.Windows.Forms.ComboBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.tbPrinter = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.btnTestPrint = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -56,7 +59,7 @@ Partial Class FormSetting
         Me.tbServer.Location = New System.Drawing.Point(102, 29)
         Me.tbServer.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.tbServer.Name = "tbServer"
-        Me.tbServer.Size = New System.Drawing.Size(204, 20)
+        Me.tbServer.Size = New System.Drawing.Size(247, 20)
         Me.tbServer.TabIndex = 1
         '
         'tbUsername
@@ -64,7 +67,7 @@ Partial Class FormSetting
         Me.tbUsername.Location = New System.Drawing.Point(102, 51)
         Me.tbUsername.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.tbUsername.Name = "tbUsername"
-        Me.tbUsername.Size = New System.Drawing.Size(204, 20)
+        Me.tbUsername.Size = New System.Drawing.Size(247, 20)
         Me.tbUsername.TabIndex = 3
         '
         'Label2
@@ -82,7 +85,7 @@ Partial Class FormSetting
         Me.tbPassword.Location = New System.Drawing.Point(102, 74)
         Me.tbPassword.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.tbPassword.Name = "tbPassword"
-        Me.tbPassword.Size = New System.Drawing.Size(204, 20)
+        Me.tbPassword.Size = New System.Drawing.Size(247, 20)
         Me.tbPassword.TabIndex = 5
         '
         'Label3
@@ -100,7 +103,7 @@ Partial Class FormSetting
         Me.tbDatabase.Location = New System.Drawing.Point(102, 97)
         Me.tbDatabase.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.tbDatabase.Name = "tbDatabase"
-        Me.tbDatabase.Size = New System.Drawing.Size(204, 20)
+        Me.tbDatabase.Size = New System.Drawing.Size(247, 20)
         Me.tbDatabase.TabIndex = 7
         '
         'Label4
@@ -116,9 +119,10 @@ Partial Class FormSetting
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.Location = New System.Drawing.Point(254, 231)
+        Me.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnCancel.Location = New System.Drawing.Point(302, 250)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(75, 23)
+        Me.btnCancel.Size = New System.Drawing.Size(75, 30)
         Me.btnCancel.TabIndex = 10
         Me.btnCancel.Text = "Close"
         Me.btnCancel.UseVisualStyleBackColor = True
@@ -126,25 +130,29 @@ Partial Class FormSetting
         'btnSave
         '
         Me.btnSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSave.Location = New System.Drawing.Point(174, 231)
+        Me.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnSave.Location = New System.Drawing.Point(220, 250)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(75, 23)
+        Me.btnSave.Size = New System.Drawing.Size(75, 30)
         Me.btnSave.TabIndex = 11
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = True
         '
         'btnConnect
         '
-        Me.btnConnect.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnConnect.Location = New System.Drawing.Point(12, 231)
+        Me.btnConnect.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnConnect.Location = New System.Drawing.Point(15, 250)
         Me.btnConnect.Name = "btnConnect"
-        Me.btnConnect.Size = New System.Drawing.Size(104, 23)
+        Me.btnConnect.Size = New System.Drawing.Size(104, 30)
         Me.btnConnect.TabIndex = 12
         Me.btnConnect.Text = "Test Connection"
         Me.btnConnect.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
+        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.Label1)
         Me.GroupBox1.Controls.Add(Me.tbServer)
         Me.GroupBox1.Controls.Add(Me.Label2)
@@ -155,7 +163,7 @@ Partial Class FormSetting
         Me.GroupBox1.Controls.Add(Me.tbPassword)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(320, 129)
+        Me.GroupBox1.Size = New System.Drawing.Size(365, 129)
         Me.GroupBox1.TabIndex = 13
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Connection"
@@ -167,7 +175,7 @@ Partial Class FormSetting
         Me.cbDocType.Items.AddRange(New Object() {"Sales Order", "Purchase Order", "Delivery Order", "Customer Invoice", "Vendor Bill"})
         Me.cbDocType.Location = New System.Drawing.Point(113, 26)
         Me.cbDocType.Name = "cbDocType"
-        Me.cbDocType.Size = New System.Drawing.Size(193, 21)
+        Me.cbDocType.Size = New System.Drawing.Size(236, 21)
         Me.cbDocType.TabIndex = 15
         '
         'Label5
@@ -181,20 +189,54 @@ Partial Class FormSetting
         '
         'GroupBox2
         '
+        Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox2.Controls.Add(Me.tbPrinter)
+        Me.GroupBox2.Controls.Add(Me.Label6)
         Me.GroupBox2.Controls.Add(Me.Label5)
         Me.GroupBox2.Controls.Add(Me.cbDocType)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 147)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(320, 72)
+        Me.GroupBox2.Size = New System.Drawing.Size(365, 90)
         Me.GroupBox2.TabIndex = 16
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Application Setting"
+        '
+        'tbPrinter
+        '
+        Me.tbPrinter.Location = New System.Drawing.Point(113, 53)
+        Me.tbPrinter.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.tbPrinter.Name = "tbPrinter"
+        Me.tbPrinter.Size = New System.Drawing.Size(236, 20)
+        Me.tbPrinter.TabIndex = 17
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(16, 56)
+        Me.Label6.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(68, 13)
+        Me.Label6.TabIndex = 16
+        Me.Label6.Text = "Printer Name"
+        '
+        'btnTestPrint
+        '
+        Me.btnTestPrint.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnTestPrint.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnTestPrint.Location = New System.Drawing.Point(126, 250)
+        Me.btnTestPrint.Name = "btnTestPrint"
+        Me.btnTestPrint.Size = New System.Drawing.Size(87, 30)
+        Me.btnTestPrint.TabIndex = 17
+        Me.btnTestPrint.Text = "Test Print"
+        Me.btnTestPrint.UseVisualStyleBackColor = True
         '
         'FormSetting
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(344, 268)
+        Me.ClientSize = New System.Drawing.Size(389, 292)
+        Me.Controls.Add(Me.btnTestPrint)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.btnConnect)
@@ -232,4 +274,7 @@ Partial Class FormSetting
     Friend WithEvents cbDocType As ComboBox
     Friend WithEvents Label5 As Label
     Friend WithEvents GroupBox2 As GroupBox
+    Friend WithEvents tbPrinter As TextBox
+    Friend WithEvents Label6 As Label
+    Friend WithEvents btnTestPrint As Button
 End Class

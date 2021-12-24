@@ -91,18 +91,20 @@ Partial Class Form1
         '
         'btnPrint
         '
-        Me.btnPrint.Location = New System.Drawing.Point(161, 457)
+        Me.btnPrint.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnPrint.Location = New System.Drawing.Point(161, 450)
         Me.btnPrint.Name = "btnPrint"
-        Me.btnPrint.Size = New System.Drawing.Size(75, 23)
+        Me.btnPrint.Size = New System.Drawing.Size(75, 30)
         Me.btnPrint.TabIndex = 6
         Me.btnPrint.Text = "Print"
         Me.btnPrint.UseVisualStyleBackColor = True
         '
         'btnClose
         '
-        Me.btnClose.Location = New System.Drawing.Point(242, 457)
+        Me.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnClose.Location = New System.Drawing.Point(242, 450)
         Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(75, 23)
+        Me.btnClose.Size = New System.Drawing.Size(75, 30)
         Me.btnClose.TabIndex = 7
         Me.btnClose.Text = "Close"
         Me.btnClose.UseVisualStyleBackColor = True
@@ -125,7 +127,7 @@ Partial Class Form1
         Me.DataGridView1.MultiSelect = False
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.RowHeadersVisible = False
-        Me.DataGridView1.Size = New System.Drawing.Size(302, 326)
+        Me.DataGridView1.Size = New System.Drawing.Size(302, 323)
         Me.DataGridView1.TabIndex = 8
         '
         'colName
@@ -168,9 +170,10 @@ Partial Class Form1
         '
         'btnSetting
         '
-        Me.btnSetting.Location = New System.Drawing.Point(15, 457)
+        Me.btnSetting.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnSetting.Location = New System.Drawing.Point(15, 450)
         Me.btnSetting.Name = "btnSetting"
-        Me.btnSetting.Size = New System.Drawing.Size(75, 23)
+        Me.btnSetting.Size = New System.Drawing.Size(75, 30)
         Me.btnSetting.TabIndex = 9
         Me.btnSetting.Text = "Setting"
         Me.btnSetting.UseVisualStyleBackColor = True
