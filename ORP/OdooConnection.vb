@@ -55,6 +55,12 @@ Public Class OdooConnection
             Dim cookie_str As String = response.Headers.Get("Set-Cookie")
             Dim cookie_arr() As String = cookie_str.Split(";")
 
+            ' Closing
+            reader.Close()
+            dataStream.Close()
+            response.Close()
+            myReq.Abort()
+
             Return cookie_arr(0)
             'Return odooResp.result.session_id
 

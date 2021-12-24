@@ -10,6 +10,16 @@ Imports ESC_POS_USB_NET
 Public Class Form1
 
     Dim WithEvents fsetting As New FormSetting
+    Dim WithEvents fpassword As New FormPassword
+    Private server_location As String
+    Private dbname As String
+    Private username As String
+    Private password As String
+    Private adminPassword As String
+    Private printerName As String
+    Private doc_type_idx As Integer = -1
+    Private session_id As String
+    Private printer_data As String
 
     Public Shared DBConnectionString As String = "Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.sqlite" + "; Integrated Security=true"
 
@@ -21,6 +31,8 @@ Public Class Form1
         Me.username = fsetting.Username
         Me.password = fsetting.Password
         Me.dbname = fsetting.Database
+        Me.adminPassword = fsetting.AdminPassword
+        Me.printerName = fsetting.PrinterName
     End Sub
 
 
@@ -41,25 +53,56 @@ Public Class Form1
     Private Sub btnSetting_Click(sender As Object, e As EventArgs) Handles btnSetting.Click
         'Open Form setting
 
-        fsetting.ShowDialog()
+        'fsetting.ShowDialog()
+        fpassword.tbInputPassword.Clear()
+        fpassword.ShowDialog()
 
     End Sub
 
-    Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
-        Try
-            Console.WriteLine("Begin connection ......")
-            Dim session_id As String = OdooConnection.GetSessionId(Me.server_location, Me.dbname, Me.username, Me.password)
-            Dim jsonData = OdooConnection.GetConnectionString(Me.dbname, Me.username, Me.password)
+    Private Sub _initConnection()
+        Me.session_id = OdooConnection.GetSessionId(Me.server_location, Me.dbname, Me.username, Me.password)
+    End Sub
 
-            'Dim postDataAccountInvoice = "{
-            '                  ""jsonrpc"":  ""2.0"",
-            '                  ""method"": ""call"",
-            '                  ""id"": 1,
-            '                  ""params"": {
-            '                    ""model"": ""account.invoice"",
-            '                    ""domain"": [[""number"", ""="", """ & tbDocNumber.Text & """]]
-            '                  }
-            '                }"
+    Private Function GetOdooWebRequest(address As String, data As Byte()) As HttpWebRequest
+        Dim myReq As HttpWebRequest = HttpWebRequest.Create(address)
+        myReq.Method = "POST"
+        myReq.ContentType = "application/json"
+        myReq.ContentLength = data.Length
+        myReq.UserAgent = "Microsoft VB.Net"
+        myReq.Timeout = 30000
+
+        If Me.session_id = "" Then
+            Me._initConnection()
+        End If
+
+        myReq.Headers.Add("Cookie", session_id)
+
+        Return myReq
+
+    End Function
+
+    Private Sub toggleComponent(val As Boolean)
+        Me.btnClose.Enabled = val
+        Me.btnSetting.Enabled = val
+        Me.btnSearch.Enabled = val
+        Me.tbDocNumber.Enabled = val
+        Me.cbDocType.Enabled = val
+    End Sub
+
+    Private Sub clearPreview()
+        Me.tbPreviewDate.Clear()
+        Me.tbPreviewNumber.Clear()
+        Me.tbPreviewPartner.Clear()
+        Me.cbPreviewAvailable.Checked = False
+    End Sub
+
+    Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
+        Me.toggleComponent(False)
+        Me.clearPreview()
+        Me.btnPrint.Enabled = False
+
+        Try
+            Dim jsonData = OdooConnection.GetConnectionString(Me.dbname, Me.username, Me.password)
             Dim postDataAccountInvoice = "{
                   ""jsonrpc"":   ""2.0"",
                   ""method"": ""call"",
@@ -69,56 +112,89 @@ Public Class Form1
                   }
                 }"
 
-            Console.WriteLine("Session ID : " & session_id)
-            If session_id <> "" Then
-                Console.WriteLine("Begin http request ......")
-                ' search document 
-                Dim postData = Encoding.ASCII.GetBytes(postDataAccountInvoice)
+            'Document Type :
+            '1. Sales Order
+            '2. Purchase Order
+            '3. Delivery Order
+            '4. Customer Invoice
+            '5. Vendor Bill
 
-                Dim myReq As HttpWebRequest = HttpWebRequest.Create(Me.server_location & "/get/customer/invoice")
-                'Dim myReq As HttpWebRequest = HttpWebRequest.Create(Me.server_location & "/web/dataset/search_read")
+            ' default document type is sales order
+            Dim request_url = Me.server_location & "/get/sales/order"
 
-                myReq.Method = "POST"
-                myReq.ContentType = "application/json"
-                myReq.ContentLength = postData.Length
-                myReq.UserAgent = "Microsoft VB.Net"
-                myReq.Timeout = 30000
-                myReq.Headers.Add("Cookie", session_id)
+            If Me.cbDocType.SelectedItem = "Customer Invoice" Then 'OK
+                request_url = Me.server_location & "/get/customer/invoice"
+            ElseIf Me.cbDocType.SelectedItem = "Purchase Order" Then
+                request_url = Me.server_location & "/get/purchase/order"
+            ElseIf Me.cbDocType.SelectedItem = "Delivery Order" Then
+                request_url = Me.server_location & "/get/delivery/order"
+            ElseIf Me.cbDocType.SelectedItem = "Vendor Bill" Then 'OK
+                request_url = Me.server_location & "/get/vendor/bill"
+            End If
 
-                Try
-                    Using stream = myReq.GetRequestStream()
-                        stream.Write(postData, 0, postData.Length)
-                    End Using
+            ' search document 
+            Dim postData = Encoding.ASCII.GetBytes(postDataAccountInvoice)
+            Dim myReq = Me.GetOdooWebRequest(request_url, postData)
+            Dim stream = myReq.GetRequestStream()
+            stream.Write(postData, 0, postData.Length)
 
-                    Dim response As HttpWebResponse = myReq.GetResponse()
-                    Dim dataStream As Stream = response.GetResponseStream()
-                    Dim reader As StreamReader = New StreamReader(dataStream)
-                    Dim responseString = reader.ReadToEnd()
+            Dim response As HttpWebResponse = myReq.GetResponse()
+            If response.StatusCode = 200 Then
+                Dim dataStream As Stream = response.GetResponseStream()
+                Dim reader As StreamReader = New StreamReader(dataStream)
+                Dim responseString = reader.ReadToEnd()
+
+                Console.WriteLine(responseString)
+
+                If responseString.ToLower.Contains("error") Then
+                    MessageBox.Show("500 Internal Server Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Me.toggleComponent(True)
+                Else
+
 
                     Dim invoiceJobj As JObject = JObject.Parse(responseString)
                     Dim resultsObj As JObject = invoiceJobj("result")
-                    Dim invoiceLines As JArray = resultsObj("invoice_lines")
+                    'Dim invoiceLines As JArray = resultsObj("invoice_lines")
 
-                    For Each line As JObject In invoiceLines
-                        Console.WriteLine(line("no"))
-                        Console.WriteLine(line("code"))
-                        Console.WriteLine(line("name"))
-                        Console.WriteLine(line("qty"))
-                        Console.WriteLine(line("uom"))
-                        Console.WriteLine(line("price_unit"))
-                        Console.WriteLine(line("disc"))
-                        Console.WriteLine(line("subtotal"))
-                        Console.WriteLine("---------------------------------------------")
-                    Next
+                    Console.WriteLine("Invoice Data")
+                    Console.WriteLine(resultsObj("number"))
 
-                Catch ex As WebException
-                    Console.WriteLine(ex.ToString)
-                End Try
+                    ' Show data to input
+                    Me.tbPreviewNumber.Text = resultsObj("number")
+                    Me.tbPreviewPartner.Text = resultsObj("partner")
+                    Me.tbPreviewDate.Text = resultsObj("invoice_date")
+                    If resultsObj("partner") <> "" Then
+                        Me.cbPreviewAvailable.Checked = True
+                        Me.btnGeneratePrinterData.Visible = False
+                        Me.btnPrint.Enabled = True
+                        Me.printer_data = resultsObj("printer_data")
+                    Else
+                        Me.cbPreviewAvailable.Checked = False
+                        Me.btnGeneratePrinterData.Visible = True
+                        Me.btnPrint.Enabled = False
+                    End If
+
+                End If
+
+                ' closing
+                reader.Close()
+                dataStream.Close()
+                response.Close()
+                stream.Close()
+                myReq.Abort()
+
+            ElseIf response.StatusCode = 500 Then
+                MessageBox.Show("500 Internal Server Erro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             End If
-        Catch ex As Exception
-            MessageBox.Show(ex.ToString, "Error Connection")
-        End Try
 
+        Catch ex As WebException
+            Console.WriteLine(ex.ToString)
+            MessageBox.Show(ex.ToString, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        Finally
+            Me.toggleComponent(True)
+        End Try
 
     End Sub
 
@@ -142,18 +218,12 @@ Public Class Form1
 
     End Sub
 
-    Private server_location As String
-    Private dbname As String
-    Private username As String
-    Private password As String
-    Private doc_type_idx As Integer = -1
-
     Private Sub initDb(conn As SQLiteConnection)
         conn.Open()
         Dim createCmd As SQLiteCommand = conn.CreateCommand()
         Using createCmd
             With createCmd
-                .CommandText = "CREATE TABLE IF NOT EXISTS orp_setting (id INTEGER NOT NULL, server_location TEXT, username TEXT, password TEXT, database TEXT, printer_name TEXT, doc_type_idx INTEGER,PRIMARY KEY(id AUTOINCREMENT) )"
+                .CommandText = "CREATE TABLE IF NOT EXISTS orp_setting (id INTEGER NOT NULL, server_location TEXT, username TEXT, password TEXT, database TEXT, printer_name TEXT,admin_password TEXT, doc_type_idx INTEGER,PRIMARY KEY(id AUTOINCREMENT) )"
                 .ExecuteNonQuery()
             End With
         End Using
@@ -167,13 +237,15 @@ Public Class Form1
                 If Not reader.HasRows Then
                     Dim insertCmd As SQLiteCommand = conn.CreateCommand()
                     With insertCmd
-                        .CommandText = "INSERT INTO orp_setting (server_location,username,password,database,printer_name) values (@server,@username,@password,@database,@printer_name)"
+                        .CommandText = "INSERT INTO orp_setting (server_location,username,password,database,printer_name,admin_password,doc_type_idx) values (@server,@username,@password,@database,@printer_name,@admin_password, @doc_type_idx)"
                         With .Parameters
                             .Add(New SQLiteParameter("@server", "dummy"))
                             .Add(New SQLiteParameter("@username", "dummy"))
                             .Add(New SQLiteParameter("@password", "dummy"))
                             .Add(New SQLiteParameter("@database", "dummy"))
                             .Add(New SQLiteParameter("@printer_name", "dummy"))
+                            .Add(New SQLiteParameter("@admin_password", "admin"))
+                            .Add(New SQLiteParameter("@doc_type_idx", "0"))
                         End With
                         .ExecuteNonQuery()
                     End With
@@ -205,6 +277,8 @@ Public Class Form1
             Me.username = reader("username").ToString
             Me.password = reader("password").ToString
             Me.dbname = reader("database").ToString
+            Me.printerName = reader("printer_name").ToString
+            Me.adminPassword = reader("admin_password").ToString
 
             Dim index As Integer = reader.GetOrdinal("doc_type_idx")
             If Not reader.IsDBNull(index) Then
@@ -228,10 +302,39 @@ Public Class Form1
     End Sub
 
     Private Sub btnPrint_Click(sender As Object, e As EventArgs) Handles btnPrint.Click
-        Dim printer As New Printer.Printer("EPSON LX-300+II ESC/P")
-        printer.Append("Testing Printer")
-        printer.PrintDocument()
+        Try
+            Dim printer As New ESC_POS_USB_NET.Printer.Printer(Me.printerName)
+            printer.Append(Me.printer_data.Replace("<p>", "").Replace("</p>", ""))
+            printer.PrintDocument()
 
+            ' delaying on printing and progressbar
+            Me.btnPrint.Enabled = False
+            For i As Integer = 10 To 100
+                Me.ProgressBar1.Value = i
+                Threading.Thread.Sleep(100)
+            Next
+            Me.ProgressBar1.Value = 0
+            Me.btnPrint.Enabled = True
+
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
+
+    End Sub
+
+    Private Sub cbDocType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDocType.SelectedIndexChanged
+        Me.clearPreview()
+        Me.tbDocNumber.Clear()
+    End Sub
+
+    Private Sub fpassword_OkButtonClicked(sender As Object, e As EventArgs) Handles fpassword.OkButtonClicked
+        Console.WriteLine(fpassword.AdminPassword)
+        If fpassword.AdminPassword = Me.adminPassword Then
+            fpassword.DialogResult = DialogResult.OK
+            fsetting.ShowDialog()
+        Else
+            MessageBox.Show("Password is not valid.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End If
     End Sub
 End Class
 

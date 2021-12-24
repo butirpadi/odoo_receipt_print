@@ -68,6 +68,15 @@ Public Class FormSetting
         End Set
     End Property
 
+    Property AdminPassword As String
+        Get
+            Return Me.tbAdminPassword.Text
+        End Get
+        Set(value As String)
+            Me.tbAdminPassword.Text = value
+        End Set
+    End Property
+
 
 
 
@@ -78,7 +87,7 @@ Public Class FormSetting
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         ' SAVE SETTING TO SQLITE DATABASE
-        Dim query As String = "UPDATE orp_setting SET server_location = @server, database = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx, printer_name = @printer_name "
+        Dim query As String = "UPDATE orp_setting SET server_location = @server, database = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx, printer_name = @printer_name, admin_password=@admin_password "
         myconn = New SQLiteConnection(Form1.DBConnectionString)
         Try
             Using myconn
@@ -93,6 +102,7 @@ Public Class FormSetting
                         .Add(New SQLiteParameter("@password", tbPassword.Text))
                         .Add(New SQLiteParameter("@doc_type_idx", cbDocType.SelectedIndex))
                         .Add(New SQLiteParameter("@printer_name", tbPrinter.Text))
+                        .Add(New SQLiteParameter("@admin_password", tbAdminPassword.Text))
                     End With
                     'Dim dr As SQLiteDataReader
                     'dr = cmd.ExecuteReader()
@@ -114,7 +124,7 @@ Public Class FormSetting
         myconn = New SQLiteConnection(Form1.DBConnectionString)
         myconn.Open()
         Dim selectCmd As New SQLiteCommand(myconn)
-        selectCmd.CommandText = "select * from orp_setting where id = 1"
+        selectCmd.CommandText = "select * from orp_setting limit 1"
         Dim reader = selectCmd.ExecuteReader()
 
         ' show data to text box
@@ -124,6 +134,7 @@ Public Class FormSetting
             tbPassword.Text = reader("password").ToString
             tbDatabase.Text = reader("database").ToString
             tbPrinter.Text = reader("printer_name").ToString
+            tbAdminPassword.Text = reader("admin_password").ToString
 
             Dim index As Integer = reader.GetOrdinal("doc_type_idx")
 

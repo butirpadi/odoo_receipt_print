@@ -130,3 +130,4 @@ F:\desktop\odoo_receipt_print\ORP\bin\Debug\System.Threading.Tasks.Extensions.xm
 F:\desktop\odoo_receipt_print\ORP\bin\Debug\System.ValueTuple.xml
 F:\desktop\odoo_receipt_print\ORP\bin\Debug\ESC-POS-USB-NET.dll
 F:\desktop\odoo_receipt_print\ORP\bin\Debug\System.Drawing.Common.dll
+F:\desktop\odoo_receipt_print\ORP\obj\Debug\ORP.FormPassword.resources

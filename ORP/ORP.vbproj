@@ -171,6 +171,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormPassword.Designer.vb">
+      <DependentUpon>FormPassword.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FormPassword.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OdooConnection.vb" />
     <Compile Include="OdooResponseResult.vb" />
     <Compile Include="OdooResponse.vb" />
@@ -206,6 +212,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormPassword.resx">
+      <DependentUpon>FormPassword.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormSetting.resx">
       <DependentUpon>FormSetting.vb</DependentUpon>
