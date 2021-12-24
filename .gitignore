@@ -246,3 +246,7 @@ ModelManifest.xml
 **/*.db
 *.sqlite
 *.db
+
+# debug
+/bin/Debug/x86/*
+/bin/Debug/x64/*
