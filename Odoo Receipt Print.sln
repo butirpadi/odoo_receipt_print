@@ -1,22 +1,37 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ORP", "ORP\ORP.vbproj", "{22DB39A8-52C7-445D-B93F-706C56D5C306}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Debug|x64.ActiveCfg = Debug|x64
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Debug|x64.Build.0 = Debug|x64
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Debug|x86.ActiveCfg = Debug|x86
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Debug|x86.Build.0 = Debug|x86
 		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Release|x64.ActiveCfg = Release|x64
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Release|x64.Build.0 = Release|x64
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Release|x86.ActiveCfg = Release|x86
+		{22DB39A8-52C7-445D-B93F-706C56D5C306}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF5453B3-2C24-4BCF-81C9-0C479F681A4A}
 	EndGlobalSection
 EndGlobal

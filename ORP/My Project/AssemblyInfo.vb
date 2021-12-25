@@ -8,12 +8,12 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("ORP")>
-<Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyTitle("Odoo Receipt Print Manager")>
+<Assembly: AssemblyDescription("Application for manage direct printing of odoo receipt")>
+<Assembly: AssemblyCompany("Kode Karya")>
 <Assembly: AssemblyProduct("ORP")>
 <Assembly: AssemblyCopyright("Copyright ©  2021")>
-<Assembly: AssemblyTrademark("")>
+<Assembly: AssemblyTrademark("Kode Karya")>
 
 <Assembly: ComVisible(False)>
 
