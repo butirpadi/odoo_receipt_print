@@ -15,8 +15,8 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-[Xx]64/
-[Xx]86/
+#[Xx]64/
+#[Xx]86/
 [Bb]uild/
 bld/
 [Bb]in/
@@ -248,6 +248,5 @@ ModelManifest.xml
 *.db
 
 # debug
-/bin/Debug/x86/*
-/bin/Debug/x64/*
-/obj/Debug/*
+/ORP/bin/Debug/x86/*
+/ORP/bin/Debug/x64/*
