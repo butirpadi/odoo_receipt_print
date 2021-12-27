@@ -31,7 +31,7 @@
     <ProductName>Odoo Receipt Print Manager</ProductName>
     <PublisherName>Kode Karya</PublisherName>
     <SuiteName>Odoo Receipt Print Manager</SuiteName>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
