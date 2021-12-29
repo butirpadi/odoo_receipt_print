@@ -5,10 +5,6 @@ Imports System.Net.Http
 Imports System.Text
 Imports Newtonsoft.Json
 
-
-
-
-
 Public Class FormSetting
 
     Dim myconn As SQLiteConnection
