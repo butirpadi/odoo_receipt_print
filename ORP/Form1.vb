@@ -304,7 +304,7 @@ Public Class Form1
     Private Sub btnPrint_Click(sender As Object, e As EventArgs) Handles btnPrint.Click
         Try
             Dim printer As New ESC_POS_USB_NET.Printer.Printer(Me.printerName)
-            printer.Append(Me.printer_data)
+            printer.Append(Chr(27) & Chr(33) & Chr(4) & Me.printer_data & Chr(27) & Chr(33) & Chr(4))
             printer.PrintDocument()
 
             ' delaying on printing and progressbar
