@@ -321,6 +321,7 @@ Partial Class Form1
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(527, 12)
         Me.ProgressBar1.TabIndex = 14
+        Me.ProgressBar1.Visible = False
         '
         'Form1
         '

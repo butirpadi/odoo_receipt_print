@@ -309,11 +309,11 @@ Public Class Form1
 
             ' delaying on printing and progressbar
             Me.btnPrint.Enabled = False
-            For i As Integer = 10 To Me.ProgressBar1.Maximum
-                Me.ProgressBar1.Value = i
-                Threading.Thread.Sleep(100)
-            Next
-            Me.ProgressBar1.Value = 0
+            'For i As Integer = 10 To Me.ProgressBar1.Maximum
+            '    Me.ProgressBar1.Value = i
+            '    Threading.Thread.Sleep(100)
+            'Next
+            'Me.ProgressBar1.Value = 0
             Me.btnPrint.Enabled = True
 
         Catch ex As Exception
