@@ -18,14 +18,40 @@ Public Class Form1
     Private adminPassword As String
     Private printerName As String
     Private doc_type_idx As Integer = -1
+    Private font_index As Integer = -1
+    Private font_style_index As Integer = -1
     Private session_id As String
     Private printer_data As String
 
-    Public Shared DBConnectionString As String = "Data Source=" + Directory.GetCurrentDirectory() + "\orpsqlite.sqlite" + "; Integrated Security=true"
+    ' FONT
+    Private ROMAN_FONT As String = Chr(27) & Chr(107) & Chr(48)
+    Private SANS_FONT As String = Chr(27) & Chr(107) & Chr(49)
+    Private DRAFT_FONT As String = Chr(27) & Chr(120) & Chr(48)
+    Private NLQ_FONT As String = Chr(27) & Chr(120) & Chr(49)
+
+    ' STYLE
+    Private STYLE_PICA As String = Chr(27) & Chr(33) & Chr(0)
+    Private STYLE_ELITE As String = Chr(27) & Chr(33) & Chr(1)
+    Private STYLE_CONDENSED As String = Chr(27) & Chr(33) & Chr(4)
+    Private STYLE_EMPHASIZED As String = Chr(27) & Chr(33) & Chr(8)
+    Private STYLE_DOUBLE_STRIKE As String = Chr(27) & Chr(33) & Chr(16)
+    Private STYLE_DOUBLE_WIDE As String = Chr(27) & Chr(33) & Chr(32)
+    Private STYLE_ITALIC As String = Chr(27) & Chr(33) & Chr(64)
+    Private STYLE_UNDERLINE As String = Chr(27) & Chr(33) & Chr(128)
+
+    Private SIZE_CONDENSED As String = Chr(15)
+    Private SIZE_ELITE As String = Chr(27) & Chr(77)
+    Private SIZE_PICA As String = Chr(27) & Chr(77)
+
+    Private CANCEL_CONDENSED As String = Chr(18)
+    Private CANCEL_COMMAND As String = Chr(27) & Chr(55)
+
+    Public Shared DBConnectionString As String = "Data Source=" + Directory.GetCurrentDirectory() + "\mydb.sqlite" + "; Integrated Security=true"
 
     Private Sub fsetting_on_datasaved(sender As Object, e As EventArgs) Handles fsetting.DataSaved
-        Console.WriteLine("Data Setting Saved -----------------------------")
         Me.doc_type_idx = fsetting.DocumentTypeIndex
+        Me.font_index = fsetting.FontTypeIndex
+        Me.font_style_index = fsetting.FontStyleIndex
         Me.cbDocType.SelectedIndex = fsetting.DocumentTypeIndex
         Me.server_location = fsetting.ServerLocation
         Me.username = fsetting.Username
@@ -33,6 +59,7 @@ Public Class Form1
         Me.dbname = fsetting.Database
         Me.adminPassword = fsetting.AdminPassword
         Me.printerName = fsetting.PrinterName
+        Console.WriteLine("Update Setting")
     End Sub
 
 
@@ -108,7 +135,8 @@ Public Class Form1
                   ""method"": ""call"",
                   ""id"": 1,
                   ""params"": {
-                    ""number"": """ & tbDocNumber.Text & """
+                    ""number"": """ & tbDocNumber.Text & """,
+                    ""font_type"": """ & CStr(Me.font_style_index) & """
                   }
                 }"
 
@@ -144,7 +172,6 @@ Public Class Form1
                 Dim reader As StreamReader = New StreamReader(dataStream)
                 Dim responseString = reader.ReadToEnd()
 
-                Console.WriteLine(responseString)
 
                 If responseString.ToLower.Contains("error") Then
                     MessageBox.Show("500 Internal Server Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -155,9 +182,6 @@ Public Class Form1
                     Dim invoiceJobj As JObject = JObject.Parse(responseString)
                     Dim resultsObj As JObject = invoiceJobj("result")
                     'Dim invoiceLines As JArray = resultsObj("invoice_lines")
-
-                    Console.WriteLine("Invoice Data")
-                    Console.WriteLine(resultsObj("number"))
 
                     ' Show data to input
                     Me.tbPreviewNumber.Text = resultsObj("number")
@@ -223,7 +247,7 @@ Public Class Form1
         Dim createCmd As SQLiteCommand = conn.CreateCommand()
         Using createCmd
             With createCmd
-                .CommandText = "CREATE TABLE IF NOT EXISTS orp_setting (id INTEGER NOT NULL, server_location TEXT, username TEXT, password TEXT, database TEXT, printer_name TEXT,admin_password TEXT, doc_type_idx INTEGER,PRIMARY KEY(id AUTOINCREMENT) )"
+                .CommandText = "CREATE TABLE IF NOT EXISTS orp_setting (id INTEGER NOT NULL, server_location TEXT, username TEXT, password TEXT, database TEXT, printer_name TEXT,admin_password TEXT, doc_type_idx INTEGER, font_type_index INTEGER,font_style_index INTEGER,PRIMARY KEY(id AUTOINCREMENT) )"
                 .ExecuteNonQuery()
             End With
         End Using
@@ -280,13 +304,38 @@ Public Class Form1
             Me.printerName = reader("printer_name").ToString
             Me.adminPassword = reader("admin_password").ToString
 
-            Dim index As Integer = reader.GetOrdinal("doc_type_idx")
-            If Not reader.IsDBNull(index) Then
-                Me.doc_type_idx = CInt(reader("doc_type_idx"))
-            Else
+            'Dim index As Integer = reader.GetOrdinal("doc_type_idx")
+            'If Not reader.IsDBNull(index) Then
+            '    Me.doc_type_idx = CInt(reader("doc_type_idx"))
+            'Else
+            '    Me.doc_type_idx = -1
+            'End If
+
+            'Me.doc_type_idx = IIf(reader("doc_type_idx").ToString.Trim = "", -1, CInt(reader("doc_type_idx").ToString))
+
+            If reader("doc_type_idx").ToString.Trim = "" Then
                 Me.doc_type_idx = -1
+            Else
+                Me.doc_type_idx = CInt(reader("doc_type_idx").ToString.Trim)
             End If
+
             Me.cbDocType.SelectedIndex = Me.doc_type_idx
+
+            If reader("font_type_index").ToString.Trim = "" Then
+                Me.font_index = -1
+            Else
+                Me.font_index = CInt(reader("font_type_index").ToString.Trim)
+            End If
+
+            If reader("font_style_index").ToString.Trim = "" Then
+                Me.font_style_index = -1
+            Else
+                Me.font_style_index = CInt(reader("font_style_index").ToString.Trim)
+            End If
+
+            'Me.font_index = IIf(reader("font_type_index").ToString.Trim = "", -1, CInt(reader("font_type_index").ToString))
+            'Me.font_style_index = IIf(reader("font_style_index").ToString.Trim = "", -1, CInt(reader("font_style_index").ToString))
+
         End While
 
         reader.Close()
@@ -301,11 +350,293 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub btnPrint_Click(sender As Object, e As EventArgs) Handles btnPrint.Click
+    Private Sub _printing_task()
         Try
             Dim printer As New ESC_POS_USB_NET.Printer.Printer(Me.printerName)
-            printer.Append(Chr(27) & Chr(33) & Chr(4) & Me.printer_data & Chr(27) & Chr(33) & Chr(4))
+            Dim can_print As Boolean = False
+
+            '' font type
+            '' 0 ROMAN
+            '' 1 SANS SERIF
+            '' 2 DRAFT
+            '' 3 NLQ
+            '' 4 PICA ROMAN
+            '' 5 PICA SANS SERIF
+            '' 6 PICA DRAFT
+            '' 7 PICA NLQ
+            '' 8 ELITE ROMAN
+            '' 9 ELITE SANS SERIF
+            '' 10 ELITE DRAFT
+            '' 11 ELITE NLQ
+            '' 12 CONDENSED ROMAN
+            '' 13 CONDENSED SANS SERIF
+            '' 14 CONDENSED DRAFT
+            '' 15 CONDENSED NLQ
+            '' 16 EMPHASIZED ROMAN
+            '' 17 EMPHASIZED SANS SERIF
+            '' 18 EMPHASIZED DRAFT
+            '' 19 EMPHASIZED NLQ
+            '' 20 DOUBLE STRIKE ROMAN
+            '' 21 DOUBLE STRIKE SANS SERIF
+            '' 22 DOUBLE STRIKE DRAFT
+            '' 23 DOUBLE STRIKE NLQ
+            '' 24 DOUBLE WIDE ROMAN
+            '' 25 DOUBLE WIDE SANS SERIF
+            '' 26 DOUBLE WIDE DRAFT
+            '' 27 DOUBLE WIDE NLQ
+
+
+            Dim printer_content As String = ""
+            'Dim printer_content As String = "1  5021533        LAMPU NATAL KABEL HITAM POLOS ECO A 100M                 1          KTN/5        214,000              0        214,000"
+            'Dim printer_content As String = "1  5021533   LAMPU NATAL KABEL HITAM POLOS EC     1     KTN/5        214,000         0        214,000"
+            'Dim printer_content As String = "XXXYYYYYYYYYYDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDQQQQQWWWWWWWWWWTTTTTTTTTTTTTTTPPPPPJJJJJJJJJJJJJJJ"
+
+            ''printer_content = "Font Index : " & Me.font_index & "\n" & printer_content
+            ''printer_content = Me.CANCEL_COMMAND & Me.CANCEL_CONDENSED & printer_content
+
+            ' 0 : Normal
+            ' 1 : Condensed
+            'Console.WriteLine(printer_content)
+
+            ' Font :::
+            ' Roman
+            ' Sans
+            ' Draft
+            ' NLQ
+            If Me.font_index = 0 Then
+                printer_content = Me.ROMAN_FONT & Me.printer_data
+            ElseIf Me.font_index = 2 Then
+                printer_content = Me.DRAFT_FONT & Me.printer_data
+            ElseIf Me.font_index = 3 Then
+                printer_content = Me.NLQ_FONT & Me.printer_data
+            Else
+                printer_content = Me.SANS_FONT & Me.printer_data
+            End If
+
+            'Font STYLE
+            'Normal
+            'Condensed
+            If Me.font_style_index = 0 Then
+                printer_content = Me.STYLE_ELITE & printer_content
+            Else
+                printer_content = Me.STYLE_CONDENSED & printer_content
+            End If
+
+
+            'printer.Append(Me.ROMAN_FONT & printer_content)
+            'printer.Append(Me.SANS_FONT & printer_content)
+            'printer.Append(Me.DRAFT_FONT & printer_content)
+            'printer.Append(Me.NLQ_FONT & printer_content)
+            'printer.Append("---------------------------------------------------------------------------------------")
+            'printer.Append(Me.STYLE_PICA & Me.ROMAN_FONT & printer_content)
+            'printer.Append(Me.STYLE_PICA & Me.SANS_FONT & printer_content)
+            'printer.Append(Me.STYLE_PICA & Me.DRAFT_FONT & printer_content)
+            'printer.Append(Me.STYLE_PICA & Me.NLQ_FONT & printer_content)
+            'printer.Append("---------------------------------------------------------------------------------------")
+            'printer.Append(Me.STYLE_ELITE & Me.ROMAN_FONT & printer_content)
+            'printer.Append(Me.STYLE_ELITE & Me.SANS_FONT & printer_content)
+            'printer.Append(Me.STYLE_ELITE & Me.DRAFT_FONT & printer_content)
+            'printer.Append(Me.STYLE_ELITE & Me.NLQ_FONT & printer_content)
+            'printer.Append("---------------------------------------------------------------------------------------")
+            'printer.Append(Me.STYLE_CONDENSED & Me.ROMAN_FONT & printer_content)
+            'printer.Append(Me.STYLE_CONDENSED & Me.SANS_FONT & printer_content)
+            'printer.Append(Me.STYLE_CONDENSED & Me.DRAFT_FONT & printer_content)
+            'printer.Append(Me.STYLE_CONDENSED & Me.NLQ_FONT & printer_content)
+            'printer.Append("---------------------------------------------------------------------------------------")
+            'printer.Append(Me.STYLE_DOUBLE_STRIKE & Me.ROMAN_FONT & printer_content)
+            'printer.Append(Me.STYLE_DOUBLE_STRIKE & Me.SANS_FONT & printer_content)
+            'printer.Append(Me.STYLE_DOUBLE_STRIKE & Me.DRAFT_FONT & printer_content)
+            'printer.Append(Me.STYLE_DOUBLE_STRIKE & Me.NLQ_FONT & printer_content)
+            'printer.Append("---------------------------------------------------------------------------------------")
+            'printer.Append(Me.STYLE_DOUBLE_WIDE & Me.ROMAN_FONT & printer_content)
+            'printer.Append(Me.STYLE_DOUBLE_WIDE & Me.SANS_FONT & printer_content)
+            'printer.Append(Me.STYLE_DOUBLE_WIDE & Me.DRAFT_FONT & printer_content)
+            'printer.Append(Me.STYLE_DOUBLE_WIDE & Me.NLQ_FONT & printer_content)
+
+            'can_print = True
+
+
+            'If Me.font_index = 0 Then
+            '    'printer_content = Chr(27) & Chr(33) & Chr(0) & printer_content & Chr(27) & Chr(33) & Chr(0)
+            '    'printer_content = Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT
+            '    printer.Append(Me.ROMAN_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 1 Then
+            '    'printer_content = Chr(27) & Chr(33) & Chr(1) & printer_content & Chr(27) & Chr(33) & Chr(1)
+            '    'printer_content = Me.SANS_FONT & printer_content & Me.SANS_FONT
+            '    printer.Append(Me.SANS_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 2 Then
+            '    'printer_content = Chr(27) & Chr(33) & Chr(4) & printer_content & Chr(27) & Chr(33) & Chr(4)
+            '    'printer_content = Me.DRAFT_FONT & printer_content & Me.DRAFT_FONT
+            '    printer.Append(Me.DRAFT_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 3 Then
+            '    'printer_content = Chr(27) & Chr(33) & Chr(8) & printer_content & Chr(27) & Chr(33) & Chr(8)
+            '    'printer_content = Me.NLQ_FONT & printer_content & Me.NLQ_FONT
+            '    printer.Append(Me.NLQ_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 4 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT
+            '    'printer_content = Me.STYLE_PICA & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.STYLE_PICA
+            '    printer.Append(Me.STYLE_PICA)
+            '    printer.Append(Me.ROMAN_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 5 Then
+            '    'printer_content = Me.SIZE_CONDE NSED & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_PICA)
+            '    printer.Append(Me.SANS_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 6 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SANS_FONT & printer_content & Me.SANS_FONT
+            '    printer.Append(Me.STYLE_PICA)
+            '    printer.Append(Me.DRAFT_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 7 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_PICA)
+            '    printer.Append(Me.NLQ_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 8 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT
+            '    'printer_content = Me.STYLE_PICA & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.STYLE_PICA
+            '    printer.Append(Me.STYLE_ELITE)
+            '    printer.Append(Me.ROMAN_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 9 Then
+            '    'printer_content = Me.SIZE_CONDE NSED & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_ELITE)
+            '    printer.Append(Me.SANS_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 10 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SANS_FONT & printer_content & Me.SANS_FONT
+            '    printer.Append(Me.STYLE_ELITE)
+            '    printer.Append(Me.DRAFT_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 11 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_ELITE)
+            '    printer.Append(Me.NLQ_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 12 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT
+            '    'printer_content = Me.STYLE_PICA & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.STYLE_PICA
+            '    printer.Append(Me.STYLE_CONDENSED)
+            '    printer.Append(Me.ROMAN_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 13 Then
+            '    'printer_content = Me.SIZE_CONDE NSED & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_CONDENSED)
+            '    printer.Append(Me.SANS_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 14 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SANS_FONT & printer_content & Me.SANS_FONT
+            '    printer.Append(Me.STYLE_CONDENSED)
+            '    printer.Append(Me.DRAFT_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 15 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_CONDENSED)
+            '    printer.Append(Me.NLQ_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 16 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT
+            '    'printer_content = Me.STYLE_PICA & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.STYLE_PICA
+            '    printer.Append(Me.STYLE_EMPHASIZED)
+            '    printer.Append(Me.ROMAN_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 17 Then
+            '    'printer_content = Me.SIZE_CONDE NSED & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_EMPHASIZED)
+            '    printer.Append(Me.SANS_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 18 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SANS_FONT & printer_content & Me.SANS_FONT
+            '    printer.Append(Me.STYLE_EMPHASIZED)
+            '    printer.Append(Me.DRAFT_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 19 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_EMPHASIZED)
+            '    printer.Append(Me.NLQ_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 20 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT
+            '    'printer_content = Me.STYLE_PICA & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.STYLE_PICA
+            '    printer.Append(Me.STYLE_DOUBLE_STRIKE)
+            '    printer.Append(Me.ROMAN_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 21 Then
+            '    'printer_content = Me.SIZE_CONDE NSED & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_DOUBLE_STRIKE)
+            '    printer.Append(Me.SANS_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 22 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SANS_FONT & printer_content & Me.SANS_FONT
+            '    printer.Append(Me.STYLE_DOUBLE_STRIKE)
+            '    printer.Append(Me.DRAFT_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 23 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_DOUBLE_STRIKE)
+            '    printer.Append(Me.NLQ_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 24 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT
+            '    'printer_content = Me.STYLE_PICA & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.STYLE_PICA
+            '    printer.Append(Me.STYLE_DOUBLE_WIDE)
+            '    printer.Append(Me.ROMAN_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 25 Then
+            '    'printer_content = Me.SIZE_CONDE NSED & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_DOUBLE_WIDE)
+            '    printer.Append(Me.SANS_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 26 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SANS_FONT & printer_content & Me.SANS_FONT
+            '    printer.Append(Me.STYLE_DOUBLE_WIDE)
+            '    printer.Append(Me.DRAFT_FONT)
+            '    can_print = True
+            'ElseIf Me.font_index = 27 Then
+            '    'printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    printer.Append(Me.STYLE_DOUBLE_WIDE)
+            '    printer.Append(Me.NLQ_FONT)
+            '    can_print = True
+            '    'ElseIf Me.font_index = 8 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.CANCEL_CONDENSED & Me.DRAFT_FONT & printer_content & Me.DRAFT_FONT
+            '    'ElseIf Me.font_index = 9 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.DRAFT_FONT & printer_content & Me.DRAFT_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 10 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.NLQ_FONT & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.NLQ_FONT
+            '    'ElseIf Me.font_index = 11 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_CONDENSED & Me.NLQ_FONT & printer_content & Me.NLQ_FONT & Me.SIZE_CONDENSED & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 12 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_PICA & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_PICA & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 13 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_PICA & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_PICA & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 14 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_PICA & Me.NLQ_FONT & printer_content & Me.NLQ_FONT & Me.SIZE_PICA & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 15 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_PICA & Me.DRAFT_FONT & printer_content & Me.DRAFT_FONT & Me.SIZE_PICA & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 16 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_ELITE & Me.ROMAN_FONT & printer_content & Me.ROMAN_FONT & Me.SIZE_ELITE & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 17 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_ELITE & Me.SANS_FONT & printer_content & Me.SANS_FONT & Me.SIZE_ELITE & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 18 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_ELITE & Me.NLQ_FONT & printer_content & Me.NLQ_FONT & Me.SIZE_ELITE & Me.CANCEL_COMMAND
+            '    'ElseIf Me.font_index = 19 Then
+            '    '    printer_content = Me.CANCEL_COMMAND & Me.SIZE_ELITE & Me.DRAFT_FONT & printer_content & Me.DRAFT_FONT & Me.SIZE_ELITE & Me.CANCEL_COMMAND
+
+            'End If
+
+            ''printer_content = printer_content & Me.CANCEL_CONDENSED & Me.CANCEL_COMMAND
+            ''printer_content = printer_content & "\n -------------------------------------------------------------"
+
+            'printer.Append(printer_content)
+
+            printer.Append(printer_content)
             printer.PrintDocument()
+            printer.Clear()
 
             ' delaying on printing and progressbar
             Me.btnPrint.Enabled = False
@@ -319,6 +650,18 @@ Public Class Form1
         Catch ex As Exception
             MsgBox(ex.Message)
         End Try
+    End Sub
+
+
+    Private Sub btnPrint_Click(sender As Object, e As EventArgs) Handles btnPrint.Click
+        'Me.font_index = Me.cbFont.SelectedIndex
+        Me._printing_task()
+
+        ' testing
+        'For i As Integer = 0 To 19
+        '    Me.font_index = i
+        '    Me._printing_task()
+        'Next
 
     End Sub
 
@@ -328,7 +671,6 @@ Public Class Form1
     End Sub
 
     Private Sub fpassword_OkButtonClicked(sender As Object, e As EventArgs) Handles fpassword.OkButtonClicked
-        Console.WriteLine(fpassword.AdminPassword)
         If fpassword.AdminPassword = Me.adminPassword Then
             fpassword.DialogResult = DialogResult.OK
             fsetting.ShowDialog()

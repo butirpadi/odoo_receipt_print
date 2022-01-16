@@ -44,6 +44,9 @@ Public Class OdooConnection
             Dim responseString = reader.ReadToEnd()
             Dim odooResp As OdooResponse = JsonConvert.DeserializeObject(Of OdooResponse)(responseString)
 
+            If responseString.Contains("Error") Then
+                Throw New System.Exception("Connection failed")
+            End If
 
             'Dim i As Integer
             'While i < response.Headers.Count
@@ -66,9 +69,14 @@ Public Class OdooConnection
 
         Catch ex As WebException
             Console.WriteLine(ex.ToString)
+            Throw ex
+        Catch ex As System.NullReferenceException
+            Console.WriteLine(ex.ToString)
+            Throw ex
+        Catch ex As System.Exception
+            Throw ex
         End Try
 
-        Return False
     End Function
 
 End Class

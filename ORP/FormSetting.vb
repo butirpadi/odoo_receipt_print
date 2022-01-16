@@ -10,9 +10,18 @@ Public Class FormSetting
     Dim myconn As SQLiteConnection
     Public Event DataSaved As EventHandler
 
+    Property FontStyleIndex() As Integer
+        Get
+            Return Me.cbFontStyle.SelectedIndex
+        End Get
+        Set(value As Integer)
+            Me.cbFontStyle.SelectedIndex = value
+        End Set
+    End Property
+
     Property ServerLocation() As String
         Get
-            Return Me.tbServer.Text
+            Return Me.tbServer.Text.Trim
         End Get
         Set(ByVal Value As String)
             Me.tbServer.Text = Value
@@ -21,7 +30,7 @@ Public Class FormSetting
 
     Property Username() As String
         Get
-            Return Me.tbUsername.Text
+            Return Me.tbUsername.Text.Trim
         End Get
         Set(ByVal Value As String)
             Me.tbUsername.Text = Value
@@ -30,7 +39,7 @@ Public Class FormSetting
 
     Property Password() As String
         Get
-            Return Me.tbPassword.Text
+            Return Me.tbPassword.Text.Trim
         End Get
         Set(ByVal Value As String)
             Me.tbPassword.Text = Value
@@ -39,7 +48,7 @@ Public Class FormSetting
 
     Property Database() As String
         Get
-            Return Me.tbDatabase.Text
+            Return Me.tbDatabase.Text.Trim
         End Get
         Set(ByVal Value As String)
             Me.tbDatabase.Text = Value
@@ -55,9 +64,18 @@ Public Class FormSetting
         End Set
     End Property
 
+    Property FontTypeIndex() As Integer
+        Get
+            Return Me.cbFont.SelectedIndex
+        End Get
+        Set(ByVal Value As Integer)
+            Me.cbFont.SelectedIndex = Value
+        End Set
+    End Property
+
     Property PrinterName As String
         Get
-            Return Me.tbPrinter.Text
+            Return Me.tbPrinter.Text.Trim
         End Get
         Set(value As String)
             Me.tbPrinter.Text = value
@@ -66,7 +84,7 @@ Public Class FormSetting
 
     Property AdminPassword As String
         Get
-            Return Me.tbAdminPassword.Text
+            Return Me.tbAdminPassword.Text.Trim
         End Get
         Set(value As String)
             Me.tbAdminPassword.Text = value
@@ -83,7 +101,7 @@ Public Class FormSetting
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         ' SAVE SETTING TO SQLITE DATABASE
-        Dim query As String = "UPDATE orp_setting SET server_location = @server, database = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx, printer_name = @printer_name, admin_password=@admin_password "
+        Dim query As String = "UPDATE orp_setting SET server_location = @server, database = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx, printer_name = @printer_name, admin_password=@admin_password, font_type_index=@font_type_index, font_style_index=@font_style_index"
         myconn = New SQLiteConnection(Form1.DBConnectionString)
         Try
             Using myconn
@@ -99,6 +117,8 @@ Public Class FormSetting
                         .Add(New SQLiteParameter("@doc_type_idx", cbDocType.SelectedIndex))
                         .Add(New SQLiteParameter("@printer_name", tbPrinter.Text))
                         .Add(New SQLiteParameter("@admin_password", tbAdminPassword.Text))
+                        .Add(New SQLiteParameter("@font_type_index", cbFont.SelectedIndex))
+                        .Add(New SQLiteParameter("@font_style_index", cbFontStyle.SelectedIndex))
                     End With
                     'Dim dr As SQLiteDataReader
                     'dr = cmd.ExecuteReader()
@@ -132,11 +152,42 @@ Public Class FormSetting
             tbPrinter.Text = reader("printer_name").ToString
             tbAdminPassword.Text = reader("admin_password").ToString
 
-            Dim index As Integer = reader.GetOrdinal("doc_type_idx")
-
-            If Not reader.IsDBNull(index) Then
-                cbDocType.SelectedIndex = CInt(reader("doc_type_idx"))
+            If reader("doc_type_idx").ToString.Trim = "" Then
+                cbDocType.SelectedIndex = -1
+            Else
+                cbDocType.SelectedIndex = CInt(reader("doc_type_idx").ToString.Trim)
             End If
+
+            If reader("font_type_index").ToString.Trim = "" Then
+                cbFont.SelectedIndex = -1
+            Else
+                cbFont.SelectedIndex = CInt(reader("font_type_index").ToString.Trim)
+            End If
+
+            If reader("font_style_index").ToString.Trim = "" Then
+                cbFontStyle.SelectedIndex = -1
+            Else
+                cbFontStyle.SelectedIndex = CInt(reader("font_style_index").ToString.Trim)
+            End If
+
+            'cbFont.SelectedIndex = CInt(reader("font_type_index").ToString)
+            'cbDocType.SelectedIndex = CInt(reader("doc_type_idx").ToString)
+            'cbFontStyle.SelectedIndex = CInt(reader("font_style_index").ToString)
+
+            'Dim index As Integer = reader.GetOrdinal("doc_type_idx")
+            'Dim font_type_index As Integer = reader.GetOrdinal("font_type_index")
+
+            'If Not reader.IsDBNull(index) Then
+            '    If Not index > cbDocType.Items.Count Then
+            '        cbDocType.SelectedIndex = CInt(reader("doc_type_idx"))
+            '    End If
+            'End If
+
+            'If Not reader.IsDBNull(font_type_index) Then
+            '    If Not font_type_index > cbFont.Items.Count Then
+            '        cbFont.SelectedIndex = CInt(reader("font_type_index"))
+            '    End If
+            'End If
         End While
 
         reader.Close()
@@ -185,7 +236,10 @@ Public Class FormSetting
         'End Try
 
         Try
-            MessageBox.Show(OdooConnection.GetSessionId(tbServer.Text, tbDatabase.Text, tbUsername.Text, tbPassword.Text), "Connection Success")
+            Dim session_id As String = OdooConnection.GetSessionId(tbServer.Text, tbDatabase.Text, tbUsername.Text, tbPassword.Text)
+            If session_id <> "" Then
+                MessageBox.Show("Connection Success", "Info")
+            End If
         Catch ex As Exception
             MessageBox.Show(ex.ToString, "Error Connection")
         End Try
