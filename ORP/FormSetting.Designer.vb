@@ -46,6 +46,7 @@ Partial Class FormSetting
         Me.btnTestPrint = New System.Windows.Forms.Button()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.cbFontStyle = New System.Windows.Forms.ComboBox()
+        Me.cbTesting = New System.Windows.Forms.CheckBox()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -127,7 +128,7 @@ Partial Class FormSetting
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnCancel.Location = New System.Drawing.Point(302, 339)
+        Me.btnCancel.Location = New System.Drawing.Point(302, 380)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 30)
         Me.btnCancel.TabIndex = 10
@@ -138,7 +139,7 @@ Partial Class FormSetting
         '
         Me.btnSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnSave.Location = New System.Drawing.Point(220, 339)
+        Me.btnSave.Location = New System.Drawing.Point(220, 380)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(75, 30)
         Me.btnSave.TabIndex = 11
@@ -149,7 +150,7 @@ Partial Class FormSetting
         '
         Me.btnConnect.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnConnect.Location = New System.Drawing.Point(15, 339)
+        Me.btnConnect.Location = New System.Drawing.Point(15, 380)
         Me.btnConnect.Name = "btnConnect"
         Me.btnConnect.Size = New System.Drawing.Size(104, 30)
         Me.btnConnect.TabIndex = 12
@@ -198,6 +199,7 @@ Partial Class FormSetting
         '
         Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox2.Controls.Add(Me.cbTesting)
         Me.GroupBox2.Controls.Add(Me.Label9)
         Me.GroupBox2.Controls.Add(Me.cbFontStyle)
         Me.GroupBox2.Controls.Add(Me.Label8)
@@ -210,7 +212,7 @@ Partial Class FormSetting
         Me.GroupBox2.Controls.Add(Me.cbDocType)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 147)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(365, 169)
+        Me.GroupBox2.Size = New System.Drawing.Size(365, 227)
         Me.GroupBox2.TabIndex = 16
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Application Setting"
@@ -275,7 +277,7 @@ Partial Class FormSetting
         '
         Me.btnTestPrint.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnTestPrint.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnTestPrint.Location = New System.Drawing.Point(126, 339)
+        Me.btnTestPrint.Location = New System.Drawing.Point(126, 380)
         Me.btnTestPrint.Name = "btnTestPrint"
         Me.btnTestPrint.Size = New System.Drawing.Size(87, 30)
         Me.btnTestPrint.TabIndex = 17
@@ -301,11 +303,21 @@ Partial Class FormSetting
         Me.cbFontStyle.Size = New System.Drawing.Size(236, 21)
         Me.cbFontStyle.TabIndex = 23
         '
+        'cbTesting
+        '
+        Me.cbTesting.AutoSize = True
+        Me.cbTesting.Location = New System.Drawing.Point(114, 159)
+        Me.cbTesting.Name = "cbTesting"
+        Me.cbTesting.Size = New System.Drawing.Size(96, 17)
+        Me.cbTesting.TabIndex = 24
+        Me.cbTesting.Text = "Only for testing"
+        Me.cbTesting.UseVisualStyleBackColor = True
+        '
         'FormSetting
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(389, 381)
+        Me.ClientSize = New System.Drawing.Size(389, 422)
         Me.Controls.Add(Me.btnTestPrint)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
@@ -353,4 +365,5 @@ Partial Class FormSetting
     Friend WithEvents cbFont As ComboBox
     Friend WithEvents Label9 As Label
     Friend WithEvents cbFontStyle As ComboBox
+    Friend WithEvents cbTesting As CheckBox
 End Class

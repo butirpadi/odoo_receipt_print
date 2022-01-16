@@ -101,7 +101,7 @@ Public Class FormSetting
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         ' SAVE SETTING TO SQLITE DATABASE
-        Dim query As String = "UPDATE orp_setting SET server_location = @server, database = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx, printer_name = @printer_name, admin_password=@admin_password, font_type_index=@font_type_index, font_style_index=@font_style_index"
+        Dim query As String = "UPDATE orp_setting SET server_location = @server, database = @dbname, username = @username, password = @password, doc_type_idx= @doc_type_idx, printer_name = @printer_name, admin_password=@admin_password, font_type_index=@font_type_index, font_style_index=@font_style_index, is_testing=@is_testing"
         myconn = New SQLiteConnection(Form1.DBConnectionString)
         Try
             Using myconn
@@ -119,6 +119,7 @@ Public Class FormSetting
                         .Add(New SQLiteParameter("@admin_password", tbAdminPassword.Text))
                         .Add(New SQLiteParameter("@font_type_index", cbFont.SelectedIndex))
                         .Add(New SQLiteParameter("@font_style_index", cbFontStyle.SelectedIndex))
+                        .Add(New SQLiteParameter("@is_testing", IIf(cbTesting.Checked, 1, 0)))
                     End With
                     'Dim dr As SQLiteDataReader
                     'dr = cmd.ExecuteReader()
@@ -170,24 +171,17 @@ Public Class FormSetting
                 cbFontStyle.SelectedIndex = CInt(reader("font_style_index").ToString.Trim)
             End If
 
-            'cbFont.SelectedIndex = CInt(reader("font_type_index").ToString)
-            'cbDocType.SelectedIndex = CInt(reader("doc_type_idx").ToString)
-            'cbFontStyle.SelectedIndex = CInt(reader("font_style_index").ToString)
+            If reader("is_testing").ToString.Trim = "" Then
+                cbTesting.Checked = False
+            Else
+                Dim Val As Integer = CInt(reader("is_testing").ToString.Trim)
+                If Val = 0 Then
+                    cbTesting.Checked = False
+                Else
+                    cbTesting.Checked = True
+                End If
+            End If
 
-            'Dim index As Integer = reader.GetOrdinal("doc_type_idx")
-            'Dim font_type_index As Integer = reader.GetOrdinal("font_type_index")
-
-            'If Not reader.IsDBNull(index) Then
-            '    If Not index > cbDocType.Items.Count Then
-            '        cbDocType.SelectedIndex = CInt(reader("doc_type_idx"))
-            '    End If
-            'End If
-
-            'If Not reader.IsDBNull(font_type_index) Then
-            '    If Not font_type_index > cbFont.Items.Count Then
-            '        cbFont.SelectedIndex = CInt(reader("font_type_index"))
-            '    End If
-            'End If
         End While
 
         reader.Close()
@@ -197,44 +191,6 @@ Public Class FormSetting
 
 
     Private Sub btnConnect_Click(sender As Object, e As EventArgs) Handles btnConnect.Click
-        ' test connectino and get session
-        'Dim jsonData = "{
-        '      ""jsonrpc"":     ""2.0"",
-        '      ""method"": ""call"",
-        '      ""id"": 1,
-        '      ""params"": {
-        '        ""login"": """ & tbUsername.Text & """,
-        '        ""password"": """ & tbPassword.Text & """,
-        '        ""db"": """ & tbDatabase.Text & """,
-        '        ""context"": {}
-        '      }
-        '    }"
-
-        'Dim postData = Encoding.ASCII.GetBytes(jsonData)
-
-        'Dim myReq As HttpWebRequest = HttpWebRequest.Create(tbServer.Text & "/web/session/authenticate")
-        'myReq.Method = "POST"
-        'myReq.ContentType = "application/json"
-        'myReq.ContentLength = postData.Length
-        'myReq.UserAgent = "Microsoft VB.Net"
-        'myReq.Timeout = 30000
-
-        'Try
-        '    Using stream = myReq.GetRequestStream()
-        '        stream.Write(postData, 0, postData.Length)
-        '    End Using
-
-        '    Dim response As HttpWebResponse = myReq.GetResponse()
-        '    Dim dataStream As Stream = response.GetResponseStream()
-        '    Dim reader As StreamReader = New StreamReader(dataStream)
-        '    Dim responseString = reader.ReadToEnd()
-        '    Dim odooResp As OdooResponse = JsonConvert.DeserializeObject(Of OdooResponse)(responseString)
-
-        '    MessageBox.Show(responseString, "Connection Success")
-        'Catch ex As WebException
-        '    Console.WriteLine(ex.ToString)
-        'End Try
-
         Try
             Dim session_id As String = OdooConnection.GetSessionId(tbServer.Text, tbDatabase.Text, tbUsername.Text, tbPassword.Text)
             If session_id <> "" Then
