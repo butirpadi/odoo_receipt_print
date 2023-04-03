@@ -42,7 +42,7 @@ Public Class Form1
 
     Private SIZE_CONDENSED As String = Chr(15)
     Private SIZE_ELITE As String = Chr(27) & Chr(77)
-    Private SIZE_PICA As String = Chr(27) & Chr(77)
+    Private SIZE_PICA As String = Chr(27) & Chr(80)
 
     Private CANCEL_CONDENSED As String = Chr(18)
     Private CANCEL_COMMAND As String = Chr(27) & Chr(55)
